@@ -1,0 +1,16 @@
+syntax = "proto3";
+package rpcServer;
+option go_package = "services/server/proto/pb";
+
+service RpcServerService{
+    rpc GetUserById(GetUserRequest) returns (GetUserResponse);
+}
+
+message GetUserRequest{
+   string UserId = 1;
+}
+
+message GetUserResponse {
+   string Name = 1;
+}
+

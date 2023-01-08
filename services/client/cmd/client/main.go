@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/cloud/rpc/services/client/handler"
+	"github.com/cloud/rpc/services/client/services"
+	"github.com/cloud/rpc/services/server/proto/pb"
 	httpServer "github.com/go-micro/plugins/v4/server/http"
 	"go-micro.dev/v4"
 
@@ -34,10 +36,21 @@ func main() {
 	router := gin.New()
 	router.Use(gin.Recovery())
 
-	// register router
-	handler :=  handler.NewHandler()
-	handler.InitRouter(router)
 
+
+
+
+
+    //RPC client
+	c := httpService.Client()
+	//register rpc services
+	serverSvc := pb.NewRpcServerService("server-rpc-service", c)
+
+	clientSrv := services.NewClientService(serverSvc)
+
+	// register router
+	handler :=  handler.NewHandler(clientSrv)
+	handler.InitRouter(router)
 
 	hd := srv.NewHandler(router)
 	if err := srv.Handle(hd); err != nil {
@@ -45,7 +58,7 @@ func main() {
 	}
 
 	if err := httpService.Run(); err != nil {
-		fmt.Print("Unable to run the server, %v\n", err)
+		fmt.Printf("Unable to run the server, %v\n", err)
 	}
 
 }
